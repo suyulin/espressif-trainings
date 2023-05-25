@@ -15,7 +15,6 @@ use std::{
     thread::sleep,
     time::Duration,
 };
-use wifi::wifi;
 // If using the `binstart` feature of `esp-idf-sys`, always keep this module imported
 use esp_idf_sys as _;
 
