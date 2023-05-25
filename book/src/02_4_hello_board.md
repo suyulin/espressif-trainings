@@ -24,7 +24,6 @@ wifi_ssid = "Your Wifi name"
 wifi_psk = "Your Wifi password"
 ```
 
-
 ✅ Build, flash and monitor the project:
 
 ```console
@@ -49,33 +48,35 @@ rst:0x1 (POWERON),boot:0xc (SPI_FAST_FLASH_BOOT)
 I (4427) wifi::wifi: Wifi connected!
 ```
 
->🔎 If `cargo run` has been successful, you can exit with `ctrl+C`.
+> 🔎 If `cargo run` has been successful, you can exit with `ctrl+C`.
 
 > 🔎 `cargo run` is [configured to use `espflash`](https://github.com/esp-rs/espressif-trainings/blob/main/intro/hardware-check/.cargo/config.toml#L6) as [custom runner](https://doc.rust-lang.org/cargo/reference/config.html#target). The same output can be achieved via:
+>
 > - Using `cargo-espflash`: `cargo espflash flash --release --monitor`
-> - Building your project and flashing it with `espflash`: `cargo build --release && espflash target/riscv32imc-esp-espidf/release/hardware-check`
-> This modification is applied to all the projects in the training for convenience.
+> - Building your project and flashing it with `espflash`: `cargo build --release && espflash target/xtensa-esp32s3-espidf/release/hardware-check`
+>   This modification is applied to all the projects in the training for convenience.
 
 The board LED should turn yellow on startup, and then, depending on whether a Wifi connection could be established, either turn red (error) or blink, alternating green and blue, in case of succeeding. In case of a Wifi error, a diagnostic message will also show up at the bottom, e.g.:
 
 ```console
 Error: could not connect to Wi-Fi network: ESP_ERR_TIMEOUT
 ```
+
 > ⚠️ You will get an `ESP_ERR_TIMEOUT` error also in case your network name or password are incorrect, so double-check those.
 
 ## Extra information about building, flashing and monitoring
 
 If you want to try to build without flashing, you can run:
 
- ```console
- cargo build
- ```
+```console
+cargo build
+```
+
 You can also monitor the device without flashing it with the following command:
 
 ```console
 espflash monitor
 ```
-
 
 # Troubleshooting
 
@@ -83,11 +84,11 @@ espflash monitor
 
 ```console
 error[E0463]: can't find crate for `core`
-= note: the `riscv32imc-esp-espidf` target may not be installed
+= note: the `xtensa-esp32s3-espidf` target may not be installed
 ```
 
 You're trying to build with a `stable` Rust - you need to use `nightly`.
-this error message is slightly misleading - this target *cannot* be installed. It needs to be built from source, using `build-std`, which is a feature available on nightly only.
+this error message is slightly misleading - this target _cannot_ be installed. It needs to be built from source, using `build-std`, which is a feature available on nightly only.
 
 ---
 
@@ -95,7 +96,7 @@ this error message is slightly misleading - this target *cannot* be installed. I
 error: cannot find macro `llvm_asm` in this scope
 ```
 
-You're using an incompatible version of nightly - configure a suitable one using `rust-toolchain.toml` or  `cargo override`.
+You're using an incompatible version of nightly - configure a suitable one using `rust-toolchain.toml` or `cargo override`.
 
 ---
 
@@ -108,11 +109,12 @@ Your Espressif toolchain installation might be damaged. Delete it and rerun the 
 ```console
 rm -rf ~/.espressif
 ```
+
 On Windows, delete `%USERPROFILE%\.espressif` folder.
 
 ---
 
- ```console
+```console
 Serial port: /dev/tty.usbserial-110
 Connecting...
 
@@ -128,8 +130,8 @@ help: Ensure that the device is connected and the reset and boot pins are not be
 
 The board is not accessible with USB-C cable. A typical connection error looks like this:
 
-
 Workarounds:
+
 1. press and hold boot button on the board, start flash command, release boot button after flashing process starts
 2. use a hub.
 

@@ -26,7 +26,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     mqttoptions.set_keep_alive(Duration::from_secs(5));
 
     let (mut client, mut connection) = Client::new(mqttoptions, 10);
-
     client.subscribe(temperature_data_topic(UUID), QoS::AtMostOnce)?;
     client.subscribe(hello_topic(UUID), QoS::AtMostOnce)?;
     thread::spawn(move || {
@@ -38,6 +37,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let color = RGB8::new(r, g, b);
             println!("Setting new color: {}", color);
             let color = ColorData::BoardLed(color);
+            println!("{}", color.topic(UUID));
             client
                 .publish(color.topic(UUID), QoS::AtLeastOnce, false, color.data())
                 .unwrap();

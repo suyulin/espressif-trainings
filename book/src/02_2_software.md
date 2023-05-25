@@ -2,26 +2,27 @@
 
 Follow the steps below for a default installation of the ESP32-C3 platform tooling.
 
-🔎 Should you desire a customized installation (e.g. building parts from source, or adding support for Xtensa targets), instructions for doing so can be found in the [Rust on ESP targets](https://esp-rs.github.io/book/installation/index.html) chapter of the *Rust on ESP* Book.
+🔎 Should you desire a customized installation (e.g. building parts from source, or adding support for Xtensa targets), instructions for doing so can be found in the [Rust on ESP targets](https://esp-rs.github.io/book/installation/index.html) chapter of the _Rust on ESP_ Book.
 
 ## Rust toolchain
 
 ✅ If you haven't got Rust on your computer, obtain it via <https://rustup.rs/>
 
-Furthermore, for ESP32-C3, a [*nightly* version](https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust) of the Rust toolchain is currently required, for this training we will use `nightly-2023-02-28` version.
+Furthermore, for ESP32-C3, a [_nightly_ version](https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust) of the Rust toolchain is currently required, for this training we will use `nightly-2023-02-28` version.
 
-✅ Install *nightly* Rust and add support for the target architecture using the following command:
+✅ Install _nightly_ Rust and add support for the target architecture using the following command:
 
 ```console
 rustup toolchain install nightly-2023-02-28 --component rust-src
 ```
 
 🔎 Rust is capable of cross-compiling to any supported target (see `rustup target list`). By default, only the native architecture of your system is installed.
-To build for the Xtensa architecture (*not* part of this material), a fork of the Rust compiler is required as of January 2022.
+To build for the Xtensa architecture (_not_ part of this material), a fork of the Rust compiler is required as of January 2022.
 
 ## Espressif toolchain
 
 Several tools are required:
+
 - [`cargo-espflash`](https://github.com/esp-rs/espflash/tree/main/cargo-espflash) - upload firmware to the microcontroller and open serial monitor with cargo integration
 - [`espflash`](https://github.com/esp-rs/espflash/tree/main/espflash) - upload firmware to the microcontroller and open serial monitor
 - [`ldproxy`](https://github.com/esp-rs/embuild/tree/master/ldproxy) - Espressif build toolchain dependency
@@ -41,9 +42,11 @@ cargo install cargo-espflash espflash ldproxy
 ```console
 sudo apt install llvm-dev libclang-dev clang
 ```
+
 ### macOS
 
 When using the Homebrew package manager, which we recommend:
+
 ```console
 brew install llvm
 ```
@@ -54,46 +57,49 @@ brew install llvm
 
 - Error `failed to run custom build command for libudev-sys vX.X.X` or `esp-idf-sys vX.X.X`:
 
-    At time of writing, this can be solved by:
-    1. Running this line:
+  At time of writing, this can be solved by:
 
-    `apt-get update \
-    && apt-get install -y vim nano git curl gcc ninja-build cmake libudev-dev python3 python3-pip libusb-1.0-0 libssl-dev \
-    pkg-config libtinfo5`
+  1. Running this line:
 
-    2. Restarting the terminal.
+  `apt-get update \
+  && apt-get install -y vim nano git curl gcc ninja-build cmake libudev-dev python3 python3-pip libusb-1.0-0 libssl-dev \
+  pkg-config libtinfo5`
 
-    3. If this is not working, try `cargo clean`, remove the `~/.espressif` folder (`%USERPROFILE%\.espressif` in Windows) and rebuild your project.
+  2. Restarting the terminal.
 
-    4. On Ubuntu, you might need to change your kernel to `5.19`. Run `uname -r` to obtain your kernel version.
+  3. If this is not working, try `cargo clean`, remove the `~/.espressif` folder (`%USERPROFILE%\.espressif` in Windows) and rebuild your project.
 
+  4. On Ubuntu, you might need to change your kernel to `5.19`. Run `uname -r` to obtain your kernel version.
 
 ## Docker
 
 An alternative environment, is to use Docker. The repository contains a `Dockerfile`
 with instructions to install the Rust toolchain, and all required packages. **This virtualized environment is designed
 to compile the binaries for the Espressif target. Flashing binaries from containers is not possible**, hence there are two options:
+
 - Execute flashing commands, e.g., `cargo-espflash`, on the host system. If proceeding with this option, it's recommended to keep two terminals open:
-    - In the container: compile the project
-    - On the host: use the `cargo-espflash` sub-command to flash the program onto the embedded hardware
+  - In the container: compile the project
+  - On the host: use the `cargo-espflash` sub-command to flash the program onto the embedded hardware
 - Use [`web-flash`](https://github.com/esp-rs/esp-web-flash-server) crate to flash the resulting binaries from the container. The container already includes `web-flash`. Here is how you would flash the build output of [`hardware-check` project](./02_4_hello_board.md):
-   ```console
-   web-flash --chip esp32c3 target/riscv32imc-esp-espidf/debug/hardware-check
-   ```
+  ```console
+  web-flash --chip esp32c3 target/xtensa-esp32s3-espidf/debug/hardware-check
+  ```
 
 ✅ Install [`Docker`](https://docs.docker.com/get-docker/) for your operating system.
 
 ✅ Get the docker image: There are 2 ways of getting the Docker image:
+
 - Build the Docker image from the `Dockerfile`:
-    ```console
-    docker image build --tag rust-std-training --file .devcontainer/Dockerfile .
-    ```
-    Building the image takes a while depending on the OS & hardware (20-30 minutes).
+  ```console
+  docker image build --tag rust-std-training --file .devcontainer/Dockerfile .
+  ```
+  Building the image takes a while depending on the OS & hardware (20-30 minutes).
 - Donwload it from [Dockerhub](https://hub.docker.com/r/espressif/rust-std-training):
-    ```console
+  `console
     docker pull espressif/rust-std-training
-    ```
-✅ Start the new Docker container:
+    `
+  ✅ Start the new Docker container:
+
 ```console
 docker run --mount type=bind,source="$(pwd)",target=/workspace,consistency=cached -it rust-std-training /bin/bash
 ```
@@ -108,13 +114,13 @@ named `/workspace` inside the container. Changes to the project on the host syst
 One editor with good Rust support is [VS Code](https://code.visualstudio.com/), which is available for most platforms.
 When using VS Code, we recommend the following extensions to help during the development.
 
-* [`Rust Analyzer`](https://rust-analyzer.github.io/) to provide code completion & navigation
-* `Even Better TOML` for editing TOML based configuration files
+- [`Rust Analyzer`](https://rust-analyzer.github.io/) to provide code completion & navigation
+- `Even Better TOML` for editing TOML based configuration files
 
 There are a few more useful extensions for advanced usage
 
-* [`lldb`](https://github.com/vadimcn/vscode-lldb) a native debugger extension based on LLDB
-* [`crates`](https://github.com/serayuzgur/crates) to help manage Rust dependencies
+- [`lldb`](https://github.com/vadimcn/vscode-lldb) a native debugger extension based on LLDB
+- [`crates`](https://github.com/serayuzgur/crates) to help manage Rust dependencies
 
 ### VS Code & Devcontainer
 
