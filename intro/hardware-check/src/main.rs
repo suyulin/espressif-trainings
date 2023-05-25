@@ -50,7 +50,10 @@ fn main() -> anyhow::Result<()> {
     info!("Wifi DHCP info: {:?}", ip_info);
 
     loop {
-        led.toggle()?;
+        led.set_high()?;
+        // we are sleeping here to make sure the watchdog isn't triggered
+        std::thread::sleep(std::time::Duration::from_secs(1));
+        led.set_low()?;
         std::thread::sleep(std::time::Duration::from_secs(1));
         info!("LED changed");
     }
