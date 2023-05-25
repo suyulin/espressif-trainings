@@ -1,44 +1,40 @@
-use anyhow::{bail, Result};
+//! Example of using blocking wifi.
+//!
+//! Add your own ssid and password
+
 use esp_idf_hal::prelude::Peripherals;
-use esp_idf_svc::eventloop::EspSystemEventLoop;
-use log::info;
-use wifi::wifi;
+use esp_idf_svc::log::EspLogger;
+use esp_idf_svc::wifi::{BlockingWifi, EspWifi};
+use esp_idf_svc::{eventloop::EspSystemEventLoop, nvs::EspDefaultNvsPartition};
+use esp_idf_sys::{self as _};
 // If using the `binstart` feature of `esp-idf-sys`, always keep this module imported
-use esp_idf_sys as _;
+use log::info;
+use wifi::connect_wifi;
 
-/// This configuration is picked up at compile time by `build.rs` from the
-/// file `cfg.toml`.
-#[toml_cfg::toml_config]
-pub struct Config {
-    #[default("")]
-    wifi_ssid: &'static str,
-    #[default("")]
-    wifi_psk: &'static str,
-}
+const SSID: &'static str = "lzy";
+const PASSWORD: &'static str = "12345678";
 
-fn main() -> Result<()> {
-    esp_idf_sys::link_patches();
-    esp_idf_svc::log::EspLogger::initialize_default();
+fn main() -> anyhow::Result<()> {
+    EspLogger::initialize_default();
 
     let peripherals = Peripherals::take().unwrap();
-    let sysloop = EspSystemEventLoop::take()?;
+    let sys_loop = EspSystemEventLoop::take()?;
+    let nvs = EspDefaultNvsPartition::take()?;
 
-    let app_config = CONFIG;
-    // Connect to the Wi-Fi network
-    let _wifi = match wifi(
-        app_config.wifi_ssid,
-        app_config.wifi_psk,
-        peripherals.modem,
-        sysloop,
-    ) {
-        Ok(inner) => {
-            println!("Connected to Wi-Fi network!");
-            inner
-        }
-        Err(err) => {
-            // Red!
-            bail!("Could not connect to Wi-Fi network: {:?}", err)
-        }
-    };
+    let mut wifi = BlockingWifi::wrap(
+        EspWifi::new(peripherals.modem, sys_loop.clone(), Some(nvs))?,
+        sys_loop,
+    )?;
+
+    connect_wifi(&mut wifi)?;
+
+    let ip_info = wifi.wifi().sta_netif().get_ip_info()?;
+
+    info!("Wifi DHCP info: {:?}", ip_info);
+
+    info!("Shutting down in 5s...");
+
+    std::thread::sleep(core::time::Duration::from_secs(5));
+
     Ok(())
 }
